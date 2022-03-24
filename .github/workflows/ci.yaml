@@ -18,17 +18,13 @@ jobs:
         with:
           sdk: stable
 
-      - run: make bootstrap
-      - run: make lint
-      - run: make test
+      - run: make bootstrap test
 
-#  publish:
-#    needs: test
-#    if: github.event_name != 'pull_request'
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/checkout@v2
-#      - uses: k-paxian/dart-package-publisher@v1.3
-#        with:
-#          credentialJson: ${{ secrets.PUB_CREDENTIALS_JSON }}
-#          skipTests: true
+      - if: github.event_name != 'pull_request'
+        name: publish pub credentials
+        env:
+          PUB_HOSTED_URL: https://pub.dev
+        run: |
+          mkdir -p "${XDG_CONFIG_HOME}/dart"
+          echo '${{ secrets.PUB_CREDENTIALS_JSON }}' > "${XDG_CONFIG_HOME}/dart/pub-credentials.json"
+          melos publish --no-dry-run --yes

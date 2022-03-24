@@ -21,12 +21,10 @@ scripts:
         - "*monorepo*"
 
   test:
-    run: melos exec --concurrency=1 -- "dart pub get && dart pub run test --reporter expanded"
+    run: melos exec -c 1 -- "dart pub run test"
     select-package:
       dir-exists:
         - "test/"
-    env:
-      MELOS_TEST: true
 
   format: dart format -o write .
 

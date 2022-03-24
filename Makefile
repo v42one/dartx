@@ -11,7 +11,7 @@ test:
 	melos test --no-select
 
 publish:
-	melos publish
+	PUB_HOSTED_URL=https://pub.dev melos publish
 
 dep:
 	melos dep
