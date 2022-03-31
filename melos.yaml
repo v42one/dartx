@@ -6,9 +6,9 @@ packages:
 
 command:
   version:
-    linkToCommits: true
     branch: main
-    workspaceChangelog: true
+    linkToCommits: true
+    workspaceChangelog: false
 
 ide:
   intellij: true
