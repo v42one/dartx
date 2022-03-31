@@ -1,6 +1,6 @@
 name: logr
 description: A minimal logging API for dart
-version: 0.1.3
+version: 0.1.4
 homepage: https://github.com/v42one/dartx/tree/main/packages/logr
 
 environment:
