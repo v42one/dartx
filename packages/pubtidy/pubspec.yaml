@@ -1,6 +1,6 @@
 name: pubtidy
 description: generate flatten entry file of package
-version: 0.0.2
+version: 0.0.2+1
 homepage: https://github.com/v42one/dartx/tree/main/packages/pubtidy
 
 environment:
