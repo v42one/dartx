@@ -13,6 +13,15 @@ test:
 publish:
 	PUB_HOSTED_URL=https://pub.dev melos publish
 
+publish.confirm:
+	PUB_HOSTED_URL=https://pub.dev melos publish --no-dry-run --yes
+
+install.pubtidy:
+	dart pub global activate --source path packages/pubtidy
+
+pubtidy: install.pubtidy
+	melos exec -c 1 -- "pubtidy"
+
 dep:
 	melos dep
 

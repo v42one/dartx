@@ -1,4 +1,4 @@
-import 'package:logr/trace/trace.dart';
+import 'package:logr/logr.dart';
 import 'package:test/test.dart';
 
 main() {

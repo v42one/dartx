@@ -1,4 +1,4 @@
-import 'package:contextdart/contextdart.dart';
+import 'package:contextdart/src/contextdart/contextdart.dart';
 
 class Hello {}
 

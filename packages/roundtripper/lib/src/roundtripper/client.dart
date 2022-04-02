@@ -29,6 +29,13 @@ class Client {
     return rt(request);
   }
 
+  String _stringifyPath(Uri uri) {
+    if (uri.hasQuery) {
+      return uri.toString();
+    }
+    return "${uri.origin}${uri.path}";
+  }
+
   Future<Response> _send(Request request) async {
     var c = conn();
 
@@ -36,7 +43,7 @@ class Client {
       var resp = await c.fetch(
         RequestOptions(
           method: request.method,
-          path: request.uri.toString(),
+          path: _stringifyPath(request.uri),
           headers: request.headers?.map(
             (key, value) =>
                 MapEntry(key, value is List ? value.join(", ") : value),

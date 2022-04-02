@@ -1,5 +1,6 @@
-export 'src/client.dart';
-export 'src/http_status.dart';
-export 'src/interfaces.dart';
-export 'src/request.dart';
-export 'src/response.dart';
+export 'src/roundtripper/http_status.dart';
+export 'src/roundtripper/response.dart';
+export 'src/roundtripper/client.dart';
+export 'src/roundtripper/interfaces.dart';
+export 'src/roundtripper/adapter.dart';
+export 'src/roundtripper/request.dart';

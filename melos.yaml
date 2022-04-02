@@ -21,7 +21,7 @@ scripts:
         - "*monorepo*"
 
   test:
-    run: melos exec -c 1 -- "dart pub run test"
+    run: melos exec -c 1 -- "dart test"
     select-package:
       dir-exists:
         - "test/"
