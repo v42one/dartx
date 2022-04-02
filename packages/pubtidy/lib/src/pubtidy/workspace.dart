@@ -1,7 +1,6 @@
 import 'dart:io';
 
-import 'package:pubtidy/patchfixer.dart';
-
+import '../../patchfixer.dart';
 import '_path_extension.dart';
 
 class Workspace {
@@ -16,11 +15,10 @@ class Workspace {
 
     var pf = PathFixer(pkgName, pkgRoot: root);
 
-    await (await _walk(root.dir("lib/src"))).forEach((f) async {
+    await (await _walkDartFiles(root.dir("lib/src"))).forEach((f) async {
       await pf.fix(f.path, apply: true);
     });
-
-    await (await _walk(root.dir("test"))).forEach((f) async {
+    await (await _walkDartFiles(root.dir("test"))).forEach((f) async {
       await pf.fix(f.path, apply: true);
     });
   }
@@ -30,11 +28,7 @@ class Workspace {
 
     Map<String, List<String>> exportFiles = {};
 
-    await (await _walk(root.dir("lib/src"))).forEach((f) async {
-      if (f.extname != ".dart") {
-        return;
-      }
-
+    await (await _walkDartFiles(root.dir("lib/src"))).forEach((f) async {
       var rp = src.relative(f.path);
 
       var parts = rp.split("/");
@@ -53,7 +47,7 @@ class Workspace {
       exportFiles[exportFile]!.add("src/${rp}");
     });
 
-    _sync(exportFiles);
+    await _sync(exportFiles);
   }
 
   Future<void> _sync(Map<String, List<String>> exportFiles) async {
@@ -75,9 +69,12 @@ class Workspace {
     return;
   }
 
-  Future<Stream<File>> _walk(Directory base) async {
+  Future<Stream<File>> _walkDartFiles(Directory base) async {
+    if (!(await base.exists())) {
+      await base.create(recursive: true);
+    }
     final file$ = await base.list(recursive: true, followLinks: false);
-    return file$.where((f) => f is File).cast<File>();
+    return file$.where((f) => f is File && f.extname == ".dart").cast<File>();
   }
 
   Future<String> _pkgName() async {

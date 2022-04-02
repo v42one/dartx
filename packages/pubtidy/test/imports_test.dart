@@ -21,7 +21,7 @@ void main() async {
         equals("package:pubtidy/imports.dart"));
   });
 
-  test("ImportsFormatter", () async {
+  test("ImportsFormatter 中文测试", () async {
     await px.fix(importedAt, apply: true);
   });
 }

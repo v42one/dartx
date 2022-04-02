@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:analyzer/dart/analysis/features.dart';
@@ -23,8 +24,11 @@ class PathFixer {
     patcher.visit(ast.unit);
 
     if (patcher.hasChanges && (apply ?? false)) {
-      print("${p.relative(filename, from: pkgRoot.path)} fixed.");
-      await File(filename).writeAsBytes(patcher.apply(ast.content.codeUnits));
+      print("[pubtidy] ${p.relative(filename, from: pkgRoot.path)} fixed.");
+
+      await File(filename).writeAsBytes(
+        patcher.apply(ast.content.codeUnits),
+      );
     }
   }
 
@@ -98,7 +102,7 @@ class ImportsPatcher extends SimpleAstVisitor<ImportDirective> {
       i++;
     }
 
-    return buf.toString().codeUnits;
+    return utf8.encode(buf.toString());
   }
 
   void visit(CompilationUnit unit) {
