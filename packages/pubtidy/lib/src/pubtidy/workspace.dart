@@ -1,6 +1,8 @@
 import 'dart:io';
 
-import '../../patchfixer.dart';
+import 'package:path/path.dart' as p;
+import 'package:pubtidy/patchfixer.dart';
+
 import '_path_extension.dart';
 
 class Workspace {
@@ -11,40 +13,68 @@ class Workspace {
   Future<void> run() async {
     var pkgName = await _pkgName();
 
-    await _generateEntryFiles();
+    var lib = root.dir("lib");
 
-    var pf = PathFixer(pkgName, pkgRoot: root);
+    List<String>? bases;
 
-    await (await _walkDartFiles(root.dir("lib/src"))).forEach((f) async {
-      await pf.fix(f.path, apply: true);
-    });
-    await (await _walkDartFiles(root.dir("test"))).forEach((f) async {
-      await pf.fix(f.path, apply: true);
+    if (await root.dir("src").exists()) {
+      await _generateEntryFiles(root.dir("src"));
+    } else {
+      await (await lib.list(recursive: false))
+          .where((f) => f is Directory)
+          .cast<Directory>()
+          .forEach(
+        (dir) async {
+          bases = [...?bases, p.basenameWithoutExtension(dir.path)];
+
+          await _generateEntryFiles(dir);
+        },
+      );
+    }
+
+    var pf = PathFixer(pkgName, pkgRoot: root, bases: bases);
+
+    await Future.forEach<String>([
+      "lib",
+      "test",
+      "bin",
+      "example",
+    ], (src) async {
+      var base = root.dir(src);
+
+      if (await base.exists()) {
+        await (await _walkDartFiles(base)).forEach((f) async {
+          await pf.fix(f.path, apply: true);
+        });
+      }
     });
   }
 
-  Future<void> _generateEntryFiles() async {
-    var src = root.dir("lib/src");
-
+  Future<void> _generateEntryFiles(Directory namespace) async {
     Map<String, List<String>> exportFiles = {};
 
-    await (await _walkDartFiles(root.dir("lib/src"))).forEach((f) async {
-      var rp = src.relative(f.path);
+    await (await _walkDartFiles(namespace)).forEach((f) async {
+      var relPath = namespace.relative(f.path);
 
-      var parts = rp.split("/");
+      var parts = relPath.split("/");
 
-      // skip src/*.dart and private files
+      // skip <base>/*.dart and private files
       if (parts.length == 1 || parts.any((p) => p.startsWith("_"))) {
         return;
       }
 
-      var exportFile = "${parts.first}.dart";
+      var base = p.basenameWithoutExtension(namespace.path);
+
+      var exportFile =
+          base == "src" ? "${parts.first}.dart" : "${base}/${parts.first}.dart";
 
       if (!exportFiles.containsKey(exportFile)) {
         exportFiles[exportFile] = [];
       }
 
-      exportFiles[exportFile]!.add("src/${rp}");
+      exportFiles[exportFile]!.add(
+        base == "src" ? "src/${relPath}" : relPath,
+      );
     });
 
     await _sync(exportFiles);

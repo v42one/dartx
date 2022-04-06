@@ -10,8 +10,13 @@ import 'package:path/path.dart' as p;
 class PathFixer {
   String pkgName;
   Directory pkgRoot;
+  List<String>? bases;
 
-  PathFixer(this.pkgName, {required this.pkgRoot});
+  PathFixer(
+    this.pkgName, {
+    required this.pkgRoot,
+    this.bases,
+  });
 
   Future<void> fix(String filename, {bool? apply}) async {
     var ast = parseFile(
@@ -51,8 +56,8 @@ class PathFixer {
     return i;
   }
 
-  String _resolve(String p) {
-    var parts = p.split("/");
+  String _resolve(String path) {
+    var parts = path.split("/");
     if (parts.length > 2 && parts.first == pkgName) {
       // ignore pkgName
       parts.removeAt(0);
@@ -60,13 +65,21 @@ class PathFixer {
       if (parts.first == "lib") {
         parts.removeAt(0);
       }
+
       // ignore src if exists
       if (parts.first == "src") {
         parts.removeAt(0);
       }
-      return "${pkgName}/${parts.first}.dart";
+
+      if (bases?.contains(parts.first) ?? false) {
+        var namespace = parts.first;
+        parts.removeAt(0);
+        return "${pkgName}/${namespace}/${p.basenameWithoutExtension(parts.first)}.dart";
+      }
+
+      return "${pkgName}/${p.basenameWithoutExtension(parts.first)}.dart";
     }
-    return p;
+    return path;
   }
 }
 

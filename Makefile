@@ -19,7 +19,7 @@ publish.confirm:
 install.pubtidy:
 	dart pub global activate --source path packages/pubtidy
 
-pubtidy: install.pubtidy
+tidy: install.pubtidy
 	melos exec -c 1 -- "pubtidy"
 
 dep:

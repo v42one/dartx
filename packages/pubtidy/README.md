@@ -15,3 +15,16 @@ lib/
 
 * only generate entry file for the first level under `lib/src/`, all sub paths will be included.
 * path starts with `_` as private will be excluded.
+
+Or flutter layout
+
+```
+lib/
+    domain/
+        a/
+        a.dart # generated with `export` files under `domain/a/` 
+    view/
+        a/
+        a.dart # generated with `export` files under `view/a/` 
+    main.dart        
+```
