@@ -1,6 +1,6 @@
 name: contextdart
 description: pure golang context.Context implements in dart
-version: 1.2.0
+version: 1.2.1
 homepage: https://github.com/v42one/dartx/tree/main/packages/contextdart
 
 

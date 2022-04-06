@@ -1,3 +1,7 @@
+## 0.0.3+1
+
+ - **FIX**: path fixer enchancement. ([02dd4015](https://github.com/v42one/dartx/commit/02dd40152186c52d6c937f5298f8e0fdcb77001a))
+
 ## 0.0.3
 
  - **FIX**: dep fix. ([8a999a97](https://github.com/v42one/dartx/commit/8a999a979cfd3dac0ea6681b45ccf02c1e36faa0))
