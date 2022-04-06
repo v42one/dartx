@@ -1,1 +1,1 @@
-export 'src/stdlogr/stdlogr.dart';
+export 'src/stdlogr.dart';

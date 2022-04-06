@@ -1,1 +1,1 @@
-export 'src/pubtidy/workspace.dart';
+export 'src/pubtidy.dart';

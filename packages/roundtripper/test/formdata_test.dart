@@ -3,8 +3,8 @@ import 'package:http_parser/http_parser.dart';
 import 'package:http_parser/src/media_type.dart';
 import 'package:logr/logr.dart';
 import 'package:logr/stdlogr.dart';
-import 'package:roundtripper/roundtripper.dart';
 import 'package:roundtripper/roundtripbuilders.dart';
+import 'package:roundtripper/roundtripper.dart';
 import 'package:test/test.dart';
 
 var logger = Logger(StdLogSink("roundtripper"));

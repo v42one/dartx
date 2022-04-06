@@ -10,12 +10,12 @@ import 'package:path/path.dart' as p;
 class PathFixer {
   String pkgName;
   Directory pkgRoot;
-  List<String>? bases;
+  List<String>? importPaths;
 
   PathFixer(
     this.pkgName, {
     required this.pkgRoot,
-    this.bases,
+    this.importPaths,
   });
 
   Future<void> fix(String filename, {bool? apply}) async {
@@ -40,7 +40,16 @@ class PathFixer {
   String import(String i, {required String at}) {
     var u = Uri.parse(i);
 
+    var atPkg = _resolve("${pkgName}/${p.relative(at, from: pkgRoot.path)}");
+
     if (u.scheme == "package") {
+      var importPkg = _resolve(u.path);
+
+      if (importPkg == atPkg ||
+          importPkg == atPkg.replaceFirst("${pkgName}/src/", "${pkgName}/")) {
+        print("[pubtidy] should not import entry `${importPkg}` at ${at}");
+      }
+
       return "${u.scheme}:${_resolve(u.path)}";
     }
 
@@ -49,36 +58,50 @@ class PathFixer {
     }
 
     if (i.startsWith("../")) {
-      var np =
-          p.relative(p.normalize(p.join(p.dirname(at), i)), from: pkgRoot.path);
-      return "package:${_resolve("${pkgName}/${np}")}";
+      var fullPath = p.relative(
+        p.normalize(p.join(p.dirname(at), i)),
+        from: pkgRoot.path,
+      );
+
+      var importPkg = _resolve("${pkgName}/${fullPath}");
+
+      print("[${atPkg}] ${at}");
+      print("[${importPkg}] ${fullPath}");
+
+      if (importPkg != atPkg) {
+        return "package:${importPkg}";
+      }
     }
+
     return i;
   }
 
   String _resolve(String path) {
     var parts = path.split("/");
+
     if (parts.length > 2 && parts.first == pkgName) {
       // ignore pkgName
       parts.removeAt(0);
+
       // ignore lib if exists
       if (parts.first == "lib") {
         parts.removeAt(0);
       }
 
-      // ignore src if exists
-      if (parts.first == "src") {
-        parts.removeAt(0);
+      var path = parts.join("/");
+
+      var i = importPaths?.indexWhere((importPath) =>
+              path.startsWith("${importPath}.dart") ||
+              path.startsWith("${importPath}/")) ??
+          -1;
+
+      if (i > -1) {
+        return "${pkgName}/${importPaths![i]}.dart";
       }
 
-      if (bases?.contains(parts.first) ?? false) {
-        var namespace = parts.first;
-        parts.removeAt(0);
-        return "${pkgName}/${namespace}/${p.basenameWithoutExtension(parts.first)}.dart";
-      }
-
-      return "${pkgName}/${p.basenameWithoutExtension(parts.first)}.dart";
+      return "${pkgName}/${path}";
     }
+
     return path;
   }
 }

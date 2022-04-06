@@ -1,1 +1,1 @@
-export 'src/patchfixer/patchfixer.dart';
+export 'src/patchfixer.dart';

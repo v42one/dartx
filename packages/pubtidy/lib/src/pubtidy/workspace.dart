@@ -15,24 +15,21 @@ class Workspace {
 
     var lib = root.dir("lib");
 
-    List<String>? bases;
+    var entries = await _collectEntries(lib);
 
-    if (await root.dir("src").exists()) {
-      await _generateEntryFiles(root.dir("src"));
-    } else {
-      await (await lib.list(recursive: false))
-          .where((f) => f is Directory)
-          .cast<Directory>()
-          .forEach(
-        (dir) async {
-          bases = [...?bases, p.basenameWithoutExtension(dir.path)];
+    await _syncExportFiles(entries);
 
-          await _generateEntryFiles(dir);
-        },
-      );
-    }
+    var importPaths = entries.keys
+        .where((e) => e != "src.dart")
+        .map((e) => e.substring(0, e.length - ".dart".length))
+        .toList()
+      ..sort((a, b) => b.split("/").length.compareTo(a.split("/").length));
 
-    var pf = PathFixer(pkgName, pkgRoot: root, bases: bases);
+    var pf = PathFixer(
+      pkgName,
+      pkgRoot: root,
+      importPaths: importPaths,
+    );
 
     await Future.forEach<String>([
       "lib",
@@ -50,49 +47,78 @@ class Workspace {
     });
   }
 
-  Future<void> _generateEntryFiles(Directory namespace) async {
-    Map<String, List<String>> exportFiles = {};
+  Future<Map<String, List<String>>> _collectEntries(
+    Directory base, {
+    String? entry,
+  }) async {
+    Map<String, List<String>> entries = {};
 
-    await (await _walkDartFiles(namespace)).forEach((f) async {
-      var relPath = namespace.relative(f.path);
+    var paths = await base.list(recursive: false).toList();
 
-      var parts = relPath.split("/");
+    await Future.forEach<FileSystemEntity>(paths, (path) async {
+      var relPath = base.relative(path.path);
 
-      // skip <base>/*.dart and private files
-      if (parts.length == 1 || parts.any((p) => p.startsWith("_"))) {
+      // skip  private files
+      if (relPath.startsWith("_")) {
         return;
       }
 
-      var base = p.basenameWithoutExtension(namespace.path);
+      if (path is Directory) {
+        var subEntries = await _collectEntries(
+          path,
+          entry: "${root.dir("lib").relative(path.path)}.dart",
+        );
 
-      var exportFile =
-          base == "src" ? "${parts.first}.dart" : "${base}/${parts.first}.dart";
+        entries = {
+          ...entries,
+          ...subEntries,
+        };
 
-      if (!exportFiles.containsKey(exportFile)) {
-        exportFiles[exportFile] = [];
+        if (entry != null) {
+          entries[entry] = [
+            ...?entries[entry],
+            "${p.basenameWithoutExtension(base.path)}/${relPath}.dart",
+          ];
+        }
+        return;
       }
 
-      exportFiles[exportFile]!.add(
-        base == "src" ? "src/${relPath}" : relPath,
-      );
+      if (entry != null && path is File && path.extname == ".dart") {
+        entries[entry] = [
+          ...?entries[entry],
+          "${p.basenameWithoutExtension(base.path)}/${relPath}",
+        ];
+      }
+
+      return;
     });
 
-    await _sync(exportFiles);
+    return entries;
   }
 
-  Future<void> _sync(Map<String, List<String>> exportFiles) async {
+  Future<void> _syncExportFiles(Map<String, List<String>> exportFiles) async {
     final lib = root.dir("lib");
 
     await Future.forEach<MapEntry<String, List<String>>>(
       exportFiles.entries,
       (e) async {
+        var depth = e.key.split("/").length - 1;
+
+        if (depth < 1) {
+          return null;
+        }
+
         var f = lib.file(e.key);
-
         await f.create(recursive: true);
-
-        return await f.writeAsString(
-          e.value.map((f) => "export '${f}';").join("\n"),
+        await f.writeAsString(
+          e.value.toSet().map((f) => "export '${f}';").join("\n"),
         );
+
+        if (e.key.startsWith("src/") && depth == 1) {
+          var f = lib.file(e.key.substring("src/".length));
+          await f.create(recursive: true);
+          await f.writeAsString("export '${e.key}';");
+        }
       },
     );
 
