@@ -39,6 +39,7 @@ class RequestLog implements RoundTripBuilder {
   }
 
   String _formatDuration(Duration d) {
+
     var microseconds = d.inMicroseconds;
     var hours = microseconds ~/ Duration.microsecondsPerHour;
     microseconds = microseconds.remainder(Duration.microsecondsPerHour);

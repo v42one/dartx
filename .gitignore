@@ -43,3 +43,4 @@ app.*.map.json
 pubspec.lock
 tmp/
 doc/
+pubspec_overrides.yaml

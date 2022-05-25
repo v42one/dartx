@@ -12,30 +12,7 @@ part of '../request.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more informations: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
-
-/// @nodoc
-class _$RequestTearOff {
-  const _$RequestTearOff();
-
-  _Request<T> call<T>(
-      {required String method,
-      required Uri uri,
-      Map<String, dynamic>? headers,
-      T? body,
-      Stream<List<int>>? requestBody}) {
-    return _Request<T>(
-      method: method,
-      uri: uri,
-      headers: headers,
-      body: body,
-      requestBody: requestBody,
-    );
-  }
-}
-
-/// @nodoc
-const $Request = _$RequestTearOff();
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
 
 /// @nodoc
 mixin _$Request<T> {
@@ -104,10 +81,11 @@ class _$RequestCopyWithImpl<T, $Res> implements $RequestCopyWith<T, $Res> {
 }
 
 /// @nodoc
-abstract class _$RequestCopyWith<T, $Res> implements $RequestCopyWith<T, $Res> {
-  factory _$RequestCopyWith(
-          _Request<T> value, $Res Function(_Request<T>) then) =
-      __$RequestCopyWithImpl<T, $Res>;
+abstract class _$$_RequestCopyWith<T, $Res>
+    implements $RequestCopyWith<T, $Res> {
+  factory _$$_RequestCopyWith(
+          _$_Request<T> value, $Res Function(_$_Request<T>) then) =
+      __$$_RequestCopyWithImpl<T, $Res>;
   @override
   $Res call(
       {String method,
@@ -118,13 +96,14 @@ abstract class _$RequestCopyWith<T, $Res> implements $RequestCopyWith<T, $Res> {
 }
 
 /// @nodoc
-class __$RequestCopyWithImpl<T, $Res> extends _$RequestCopyWithImpl<T, $Res>
-    implements _$RequestCopyWith<T, $Res> {
-  __$RequestCopyWithImpl(_Request<T> _value, $Res Function(_Request<T>) _then)
-      : super(_value, (v) => _then(v as _Request<T>));
+class __$$_RequestCopyWithImpl<T, $Res> extends _$RequestCopyWithImpl<T, $Res>
+    implements _$$_RequestCopyWith<T, $Res> {
+  __$$_RequestCopyWithImpl(
+      _$_Request<T> _value, $Res Function(_$_Request<T>) _then)
+      : super(_value, (v) => _then(v as _$_Request<T>));
 
   @override
-  _Request<T> get _value => super._value as _Request<T>;
+  _$_Request<T> get _value => super._value as _$_Request<T>;
 
   @override
   $Res call({
@@ -134,7 +113,7 @@ class __$RequestCopyWithImpl<T, $Res> extends _$RequestCopyWithImpl<T, $Res>
     Object? body = freezed,
     Object? requestBody = freezed,
   }) {
-    return _then(_Request<T>(
+    return _then(_$_Request<T>(
       method: method == freezed
           ? _value.method
           : method // ignore: cast_nullable_to_non_nullable
@@ -144,7 +123,7 @@ class __$RequestCopyWithImpl<T, $Res> extends _$RequestCopyWithImpl<T, $Res>
           : uri // ignore: cast_nullable_to_non_nullable
               as Uri,
       headers: headers == freezed
-          ? _value.headers
+          ? _value._headers
           : headers // ignore: cast_nullable_to_non_nullable
               as Map<String, dynamic>?,
       body: body == freezed
@@ -165,17 +144,25 @@ class _$_Request<T> extends _Request<T> {
   _$_Request(
       {required this.method,
       required this.uri,
-      this.headers,
+      final Map<String, dynamic>? headers,
       this.body,
       this.requestBody})
-      : super._();
+      : _headers = headers,
+        super._();
 
   @override
   final String method;
   @override
   final Uri uri;
+  final Map<String, dynamic>? _headers;
   @override
-  final Map<String, dynamic>? headers;
+  Map<String, dynamic>? get headers {
+    final value = _headers;
+    if (value == null) return null;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(value);
+  }
+
   @override
   final T? body;
   @override
@@ -185,10 +172,10 @@ class _$_Request<T> extends _Request<T> {
   bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _Request<T> &&
+            other is _$_Request<T> &&
             const DeepCollectionEquality().equals(other.method, method) &&
             const DeepCollectionEquality().equals(other.uri, uri) &&
-            const DeepCollectionEquality().equals(other.headers, headers) &&
+            const DeepCollectionEquality().equals(other._headers, _headers) &&
             const DeepCollectionEquality().equals(other.body, body) &&
             const DeepCollectionEquality()
                 .equals(other.requestBody, requestBody));
@@ -199,37 +186,37 @@ class _$_Request<T> extends _Request<T> {
       runtimeType,
       const DeepCollectionEquality().hash(method),
       const DeepCollectionEquality().hash(uri),
-      const DeepCollectionEquality().hash(headers),
+      const DeepCollectionEquality().hash(_headers),
       const DeepCollectionEquality().hash(body),
       const DeepCollectionEquality().hash(requestBody));
 
   @JsonKey(ignore: true)
   @override
-  _$RequestCopyWith<T, _Request<T>> get copyWith =>
-      __$RequestCopyWithImpl<T, _Request<T>>(this, _$identity);
+  _$$_RequestCopyWith<T, _$_Request<T>> get copyWith =>
+      __$$_RequestCopyWithImpl<T, _$_Request<T>>(this, _$identity);
 }
 
 abstract class _Request<T> extends Request<T> {
   factory _Request(
-      {required String method,
-      required Uri uri,
-      Map<String, dynamic>? headers,
-      T? body,
-      Stream<List<int>>? requestBody}) = _$_Request<T>;
+      {required final String method,
+      required final Uri uri,
+      final Map<String, dynamic>? headers,
+      final T? body,
+      final Stream<List<int>>? requestBody}) = _$_Request<T>;
   _Request._() : super._();
 
   @override
-  String get method;
+  String get method => throw _privateConstructorUsedError;
   @override
-  Uri get uri;
+  Uri get uri => throw _privateConstructorUsedError;
   @override
-  Map<String, dynamic>? get headers;
+  Map<String, dynamic>? get headers => throw _privateConstructorUsedError;
   @override
-  T? get body;
+  T? get body => throw _privateConstructorUsedError;
   @override
-  Stream<List<int>>? get requestBody;
+  Stream<List<int>>? get requestBody => throw _privateConstructorUsedError;
   @override
   @JsonKey(ignore: true)
-  _$RequestCopyWith<T, _Request<T>> get copyWith =>
+  _$$_RequestCopyWith<T, _$_Request<T>> get copyWith =>
       throw _privateConstructorUsedError;
 }

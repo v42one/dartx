@@ -27,4 +27,5 @@ jobs:
         run: |
           mkdir -p "${XDG_CONFIG_HOME}/dart"
           echo '${{ secrets.PUB_CREDENTIALS_JSON }}' > "${XDG_CONFIG_HOME}/dart/pub-credentials.json"
+          melos clean
           melos publish --no-dry-run --yes
